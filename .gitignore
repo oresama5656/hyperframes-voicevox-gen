@@ -1,0 +1,12 @@
+# Node.js
+node_modules/
+
+# 生成済みレンダリング動画（大容量のため除外）
+video-generator/renders/
+
+# 一時WAVファイル
+video-generator/assets/audio/*.wav
+
+# OS系
+.DS_Store
+Thumbs.db

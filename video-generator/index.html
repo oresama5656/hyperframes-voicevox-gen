@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="ja" data-resolution="landscape"
+  data-composition-variables='[
+    {"id":"line1_text","type":"string","label":"Line 1 Text","default":"話題のAI動画生成ツール『アンティグラビティ』！『そもそもどこからダウンロードするの？』って人のために、今すぐ使えるまでの手順を世界一わかりやすく解説するのだ！"},
+    {"id":"line2_text","type":"string","label":"Line 2 Text","default":"ステップ1！まずは公式サイトを開くのだ。URLはコメント欄や概要欄に貼ってあるから、そこをポチッと押すだけでOKなのだ！"},
+    {"id":"line3_text","type":"string","label":"Line 3 Text","default":"ステップ2！ページにある『ダウンロード』ボタンを押すのだ。ファイルが保存されたら、それをダブルクリックして起動！はい、準備はこれだけなのだ！"},
+    {"id":"line4_text","type":"string","label":"Line 4 Text","default":"ステップ3！起動したら、マイクに向かってこの通りの呪文を言うだけなのだ。画面の文字をそのまま読み上げてね？"},
+    {"id":"line5_text","type":"string","label":"Line 5 Text","default":"『ハイパーフレームズとボイスボックスで作成して。動画はハイパーフレームズ以外では絶対に作らないでね』。これだけで、AIが勝手に動き出して動画を作ってくれるのだ！"},
+    {"id":"line6_text","type":"string","label":"Line 6 Text","default":"ツールのリンクとコピペ用の呪文は、全部コメント欄に置いておくのだ！今すぐダウンロードして試してみてね！"}
+  ]'
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>Antigravity ダウンロード解説動画</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+
+      html, body {
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #010307;
+        font-family: 'Noto Sans JP', sans-serif;
+        color: #ffffff;
+      }
+
+      /* ── 背景レイヤー ── */
+      .ambient-bg {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 50% 50%, #060913 0%, #010205 100%);
+        z-index: 1;
+        overflow: hidden;
+      }
+      .glow-node {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(150px);
+        pointer-events: none;
+        opacity: 0.65;
+        transform-origin: center center;
+      }
+
+      /* ── ステージ全体レイアウト ── */
+      /* 字幕エリアを常に画面中央に配置 */
+      .stage-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center; /* ← 中央揃え（space-between から変更） */
+        gap: 40px;
+        z-index: 5;
+      }
+
+      /* ── 字幕グラスコンテナ ── */
+      .glass-container {
+        position: relative;
+        width: 1600px;
+        min-height: 260px;
+        background: rgba(8, 12, 28, 0.55);
+        border: 2px solid rgba(255, 255, 255, 0.08);
+        border-radius: 30px;
+        box-shadow:
+          0 25px 50px rgba(0, 0, 0, 0.8),
+          inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(40px);
+        -webkit-backdrop-filter: blur(40px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 32px 60px;
+        overflow: hidden;
+      }
+      .glass-container::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1.5px, transparent 1.5px);
+        background-size: 30px 30px;
+        pointer-events: none;
+        border-radius: 28px;
+      }
+
+      /* ── 字幕テキスト ── */
+      .shorts-caption {
+        font-size: 72px;
+        font-weight: 900;
+        line-height: 1.45;
+        text-align: center;
+        letter-spacing: -0.01em;
+        color: #ffffff;
+        -webkit-text-stroke: 12px #000000;
+        paint-order: stroke fill;
+        filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.9));
+        word-break: break-all;
+      }
+
+      /* ── スクリーンショットカード ── */
+      .screenshot-card {
+        position: relative;
+        width: 1100px;
+        height: 490px;
+        background: #0d111a;
+        border: 2px solid rgba(255, 255, 255, 0.08);
+        border-radius: 24px;
+        box-shadow: 0 35px 70px rgba(0, 0, 0, 0.9);
+        overflow: hidden;
+        opacity: 0;
+        transform: translateY(40px) scale(0.92);
+      }
+      .screenshot-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: top center;
+      }
+
+      /* ── ネオン強調枠（ダウンロードボタン） ── */
+      /* landing_page.png 内のダウンロードボタンの位置に合わせて調整 */
+      .glow-target-box {
+        position: absolute;
+        /* カード内の「Download for Windows」ボタン位置に合わせた値 */
+        /* カード幅1100px, 画像はtop center なので中央揃えで配置 */
+        left: 50%;
+        top: 62%;
+        transform: translate(-50%, -50%) scale(0.85);
+        width: 360px;
+        height: 72px;
+        border: 4px solid #ff2244;
+        border-radius: 10px;
+        box-shadow:
+          0 0 18px 4px rgba(255, 34, 68, 0.7),
+          inset 0 0 12px rgba(255, 34, 68, 0.15);
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      /* ── アクセントカラー ── */
+      .accent-yellow { color: #fff600 !important; text-shadow: 0 0 25px rgba(255,246,0,0.5); }
+      .accent-green  { color: #3dff12 !important; text-shadow: 0 0 25px rgba(61,255,18,0.5); }
+      .accent-cyan   { color: #00f0ff !important; text-shadow: 0 0 25px rgba(0,240,255,0.5); }
+      .accent-pink   { color: #ff007c !important; text-shadow: 0 0 25px rgba(255,0,124,0.5); }
+      .accent-orange { color: #ff6a00 !important; text-shadow: 0 0 25px rgba(255,106,0,0.5); }
+
+      /* ── 魔法の杖アイコン ── */
+      #vfx-wand {
+        position: absolute;
+        font-size: 140px;
+        z-index: 15;
+        pointer-events: none;
+        filter: drop-shadow(0 0 40px rgba(61,255,18,0.8));
+        opacity: 0;
+      }
+
+      /* ── パーティクルキャンバス ── */
+      #particle-canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 2;
+        opacity: 0.7;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ルートコンポジション -->
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="54.766000000000005"
+      data-width="1920"
+      data-height="1080"
+      class="relative w-full h-full overflow-hidden flex flex-col items-center justify-center"
+    >
+      <!-- 背景グロー -->
+      <div class="ambient-bg">
+        <div id="bg-glow-1" class="glow-node" style="top:-150px;left:-50px;width:900px;height:900px;background:radial-gradient(circle,#312e81,transparent 70%);"></div>
+        <div id="bg-glow-2" class="glow-node" style="bottom:-150px;right:-50px;width:1000px;height:1000px;background:radial-gradient(circle,#064e3b,transparent 70%);"></div>
+        <div id="bg-glow-3" class="glow-node" style="top:100px;left:550px;width:800px;height:800px;background:radial-gradient(circle,#831843,transparent 70%);"></div>
+        <div id="bg-glow-4" class="glow-node" style="bottom:150px;left:-150px;width:900px;height:900px;background:radial-gradient(circle,#164e63,transparent 70%);"></div>
+        <canvas id="particle-canvas" width="1920" height="1080"></canvas>
+      </div>
+
+      <!-- 音声トラックコンテナ（generate.js が書き換える） -->
+      <div id="audio-tracks-container" class="hidden">
+        <!-- AUDIO_TRACKS_PLACEHOLDER -->
+        <audio id="audio-bgm" data-start="0" data-duration="54.766000000000005" data-track-index="0" src="assets/audio/Pocket Quietness.mp3" data-volume="0.15"></audio>
+        <audio id="audio-s1" data-start="0.000" data-duration="10.914" data-track-index="1" src="assets/audio/line1.mp3" data-volume="1"></audio>
+        <audio id="audio-s2" data-start="10.914" data-duration="8.922" data-track-index="2" src="assets/audio/line2.mp3" data-volume="1"></audio>
+        <audio id="audio-s3" data-start="19.836" data-duration="9.770" data-track-index="3" src="assets/audio/line3.mp3" data-volume="1"></audio>
+        <audio id="audio-s4" data-start="29.606" data-duration="7.406" data-track-index="4" src="assets/audio/line4.mp3" data-volume="1"></audio>
+        <audio id="audio-s5" data-start="37.012" data-duration="10.867" data-track-index="5" src="assets/audio/line5.mp3" data-volume="1"></audio>
+        <audio id="audio-s6" data-start="47.879" data-duration="6.887" data-track-index="6" src="assets/audio/line6.mp3" data-volume="1"></audio>
+      </div>
+
+      <!-- メインステージ -->
+      <div class="stage-container">
+        <!-- 字幕グラスプレート（常に中央） -->
+        <div class="glass-container">
+          <div id="shorts-caption" class="shorts-caption"></div>
+        </div>
+
+        <!-- スクリーンショットカード（シーン2〜3で表示） -->
+        <div id="screenshot-card" class="screenshot-card">
+          <img src="assets/images/landing_page.png" class="screenshot-img" alt="Antigravity 公式サイト" />
+          <!-- ネオン強調枠：ダウンロードボタン位置を指す -->
+          <div id="glow-target-box" class="glow-target-box"></div>
+        </div>
+      </div>
+
+      <!-- 魔法の杖 VFX -->
+      <div id="vfx-wand">🪄</div>
+    </div>
+
+    <script>
+      // ★ 音声長から自動生成されたシーンタイミング（generate.js が書き込む）
+      const SCENE_TIMINGS = [{"id":"line1","start":0,"duration":10.914},{"id":"line2","start":10.914,"duration":8.922},{"id":"line3","start":19.836,"duration":9.77},{"id":"line4","start":29.606,"duration":7.406},{"id":"line5","start":37.012,"duration":10.867},{"id":"line6","start":47.879,"duration":6.887}];
+
+      // ── 字幕コンテンツ定義（テキストとハイライト） ──
+      // NOTE: 各シーンのテキストは generate.js が書き込んだ SCENE_TIMINGS と同じ順番
+      const SCENE_CONTENTS = [
+        // シーン1: 導入
+        [
+          { text: "話題の<span class='accent-cyan'>AI動画生成ツール『Antigravity』</span>！" },
+          { text: "『どこからダウンロードするの？』って人のために、" },
+          { text: "今すぐ使える手順を<span class='accent-green'>世界一わかりやすく解説</span>するのだ！" }
+        ],
+        // シーン2: ステップ1
+        [
+          { text: "ステップ<span class='accent-yellow'>1</span>！まずは<span class='accent-cyan'>公式サイト</span>を開くのだ。" },
+          { text: "URLはコメント欄や概要欄に貼ってあるから、" },
+          { text: "そこをポチッと押すだけで<span class='accent-green'>OK</span>なのだ！" }
+        ],
+        // シーン3: ステップ2（ダウンロードボタン）
+        [
+          { text: "ステップ<span class='accent-yellow'>2</span>！ページにある<span class='accent-green'>『ダウンロード』ボタン</span>を押すのだ。" },
+          { text: "ファイルが保存されたら、ダブルクリックして起動！" },
+          { text: "はい、準備はこれだけなのだ！" }
+        ],
+        // シーン4: ステップ3（呪文）
+        [
+          { text: "ステップ<span class='accent-yellow'>3</span>！起動したら、マイクに向かって" },
+          { text: "この通りの<span class='accent-pink'>呪文</span>を言うだけなのだ。" },
+          { text: "画面の文字をそのまま読み上げてね？" }
+        ],
+        // シーン5: 呪文詠唱
+        [
+          { text: "『ハイパーフレームズとボイスボックスで作成して。" },
+          { text: "動画はハイパーフレームズ以外では<span class='accent-pink'>絶対に作らないでね</span>』" },
+          { text: "これだけで、AIが勝手に動き出して動画を<span class='accent-green'>作ってくれる</span>のだ！" }
+        ],
+        // シーン6: まとめ
+        [
+          { text: "リンクとコピペ用の呪文は、全部<span class='accent-yellow'>コメント欄</span>へ！" },
+          { text: "今すぐダウンロードして<span class='accent-green'>試してみてね！</span>" }
+        ]
+      ];
+
+      // ── シード固定の乱数（100%決定論的レンダリング用） ──
+      function createSeededRandom(seed) {
+        let h = seed ^ 0xdeadbeef;
+        return function () {
+          h = Math.imul(h ^ (h >>> 16), 2246822507);
+          h = Math.imul(h ^ (h >>> 13), 3266489909);
+          return ((h ^= h >>> 16) >>> 0) / 4294967296;
+        };
+      }
+
+      // ── SCENE_TIMINGS が未定義の場合のフォールバック ──
+      // （generate.js 実行前にプレビューする場合向け）
+      const timings =
+        typeof SCENE_TIMINGS !== 'undefined'
+          ? SCENE_TIMINGS
+          : SCENE_CONTENTS.map((_, i) => ({ id: `line${i + 1}`, start: i * 5, duration: 5 }));
+
+      const totalDuration = timings.reduce((sum, t) => sum + t.duration, 0);
+
+      // data-duration を動的に補正
+      const rootEl = document.getElementById('root');
+      if (rootEl) rootEl.setAttribute('data-duration', totalDuration.toString());
+
+      // ── パーティクル初期化 ──
+      const rand = createSeededRandom(98765);
+      const particles = [];
+      for (let i = 0; i < 50; i++) {
+        particles.push({
+          x: rand() * 1920,
+          y: rand() * 1080,
+          size: rand() * 7 + 4,
+          speedY: rand() * 60 + 35,
+          amplitude: rand() * 45 + 15,
+          frequency: rand() * 0.02 + 0.006,
+          color: ['#00f0ff', '#3dff12', '#fff600', '#ff007c'][Math.floor(rand() * 4)],
+          seed: rand() * 1000,
+        });
+      }
+
+      function drawParticles(time) {
+        const canvas = document.getElementById('particle-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, 1920, 1080);
+        particles.forEach((p) => {
+          let cy = p.y - p.speedY * time;
+          if (cy < -50) cy += Math.ceil(Math.abs(cy) / 1180) * 1180;
+          else if (cy > 1130) cy -= 1180;
+          const cx = p.x + Math.sin(time * p.frequency * Math.PI * 2 + p.seed) * p.amplitude;
+          const opacity = 0.25 + Math.abs(Math.sin(time * 2.5 + p.seed)) * 0.65;
+          ctx.save();
+          ctx.globalAlpha = opacity;
+          ctx.shadowBlur = p.size * 2.5;
+          ctx.shadowColor = p.color;
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(cx, cy, p.size / 2, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        });
+      }
+
+      // ── GSAP タイムライン構築 ──
+      window.__timelines = window.__timelines || {};
+      const tl = gsap.timeline({ paused: true });
+
+      // 背景グロー アニメーション
+      tl.to('#bg-glow-1', { x: 190, y: -90, scale: 1.15, duration: totalDuration, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 0);
+      tl.to('#bg-glow-2', { x: -160, y: 120, scale: 1.10, duration: totalDuration, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 0);
+      tl.to('#bg-glow-3', { x: -100, y: -80, scale: 1.20, duration: totalDuration, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 0);
+      tl.to('#bg-glow-4', { x: 120,  y: 80,  scale: 1.15, duration: totalDuration, ease: 'sine.inOut', yoyo: true, repeat: 1 }, 0);
+
+      // パーティクル描画
+      const pConfig = { progress: 0 };
+      tl.to(pConfig, {
+        progress: 1,
+        duration: totalDuration,
+        ease: 'none',
+        onUpdate: function () { drawParticles(this.time()); },
+      }, 0);
+
+      // 字幕コンテナのイントロ
+      tl.from('.glass-container', { scale: 0.92, opacity: 0, duration: 0.5, ease: 'back.out(1.5)' }, 0.1);
+
+      // ─── シーンごとのアニメーション ───
+      timings.forEach((scene, sceneIdx) => {
+        const sceneStart = scene.start;
+        const sceneDur   = scene.duration;
+        const segments   = SCENE_CONTENTS[sceneIdx] || [{ text: '' }];
+
+        // ── シーン2（ステップ1）: スクリーンショットカードをスライドアップ
+        if (sceneIdx === 1) {
+          tl.to('#screenshot-card', {
+            opacity: 1,
+            y: 0,
+            scale: 1.0,
+            duration: 0.55,
+            ease: 'back.out(1.3)',
+          }, sceneStart + 0.2);
+        }
+
+        // ── シーン3（ステップ2）: ネオン枠を点滅させてダウンロードボタンを強調
+        if (sceneIdx === 2) {
+          tl.to('#glow-target-box', {
+            opacity: 1,
+            scale: 1.0,
+            duration: 0.35,
+            ease: 'back.out(2)',
+          }, sceneStart + 0.3);
+
+          const pulseCount = Math.max(2, Math.floor((sceneDur - 1.0) / 0.7));
+          tl.to('#glow-target-box', {
+            scale: 1.1,
+            duration: 0.35,
+            yoyo: true,
+            repeat: pulseCount * 2 - 1,
+            ease: 'sine.inOut',
+          }, sceneStart + 0.65);
+        }
+
+        // ── シーン3終了時: カードをスライドダウンして非表示
+        if (sceneIdx === 2) {
+          const hideAt = sceneStart + sceneDur - 0.45;
+          tl.to('#glow-target-box', { opacity: 0, scale: 0.85, duration: 0.3, ease: 'power2.in' }, hideAt);
+          tl.to('#screenshot-card', { opacity: 0, y: 50, scale: 0.92, duration: 0.45, ease: 'power2.in' }, hideAt);
+        }
+
+        // ── シーン4（ステップ3）: 魔法の杖を表示
+        if (sceneIdx === 3) {
+          tl.set('#vfx-wand', { opacity: 1, scale: 0, rotation: -60, x: 500, y: 160 }, sceneStart);
+          tl.to('#vfx-wand', { scale: 1, rotation: 15, duration: 0.45, ease: 'back.out(2)' }, sceneStart + 0.2);
+          const floatCount = Math.max(2, Math.floor((sceneDur - 0.7) / 1.4));
+          tl.to('#vfx-wand', { y: 200, rotation: -5, yoyo: true, repeat: floatCount * 2 - 1, duration: 0.7, ease: 'sine.inOut' }, sceneStart + 0.65);
+        }
+
+        // ── シーン5（呪文）でも杖を継続表示
+        if (sceneIdx === 4) {
+          const floatCount = Math.max(2, Math.floor(sceneDur / 1.4));
+          tl.to('#vfx-wand', { y: 185, rotation: 10, yoyo: true, repeat: floatCount * 2 - 1, duration: 0.7, ease: 'sine.inOut' }, sceneStart);
+        }
+
+        // ── シーン6開始時: 杖を消す
+        if (sceneIdx === 5) {
+          tl.to('#vfx-wand', { opacity: 0, scale: 0, duration: 0.35, ease: 'power2.in' }, sceneStart - 0.2);
+        }
+
+        // ── 字幕セグメントのタイミング計算と表示 ──
+        // 音声長を文字数で按分して各セグメントの表示時間を決定
+        const totalChars = segments.reduce((s, seg) => s + seg.text.replace(/<[^>]*>/g, '').length, 0);
+        let segCursor = sceneStart;
+
+        segments.forEach((seg, segIdx) => {
+          const charCount  = seg.text.replace(/<[^>]*>/g, '').length;
+          const segDur     = totalChars > 0 ? (charCount / totalChars) * sceneDur : sceneDur;
+          const segStart   = segCursor;
+
+          // 字幕テキストを更新（音声ぴったりのタイミングで）
+          tl.call(() => {
+            const el = document.getElementById('shorts-caption');
+            if (!el) return;
+            el.innerHTML = seg.text;
+            el.style.fontSize = '72px';
+            // フォントが大きすぎる場合に縮小
+            let attempts = 0;
+            while (el.scrollHeight > 320 && attempts < 8) {
+              const cur = parseFloat(window.getComputedStyle(el).fontSize);
+              el.style.fontSize = (cur - 6) + 'px';
+              attempts++;
+            }
+          }, null, segStart);
+
+          // 字幕のポップインアニメーション
+          tl.fromTo('#shorts-caption',
+            { scale: 0.88, opacity: 0.6 },
+            { scale: 1.0, opacity: 1, duration: 0.12, ease: 'back.out(2.5)' },
+            segStart
+          );
+
+          segCursor += segDur;
+        });
+      });
+
+      // アウトロフェード
+      tl.to('.glass-container', { scale: 0.94, opacity: 0, duration: 0.4, ease: 'power2.in' }, totalDuration - 0.4);
+
+      // タイムラインをグローバルに登録
+      window.__timelines['main'] = tl;
+    </script>
+  </body>
+</html>
