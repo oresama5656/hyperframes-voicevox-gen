@@ -38,6 +38,13 @@ npx hyperframes docs <topic> # reference docs in terminal
 > In Claude Code, always run it with `run_in_background: true`. Never run it as a foreground
 > command — it will time out and the server will die, breaking the browser preview.
 
+## Preview Before Render
+
+- Do not run `npm run render` unless the user explicitly asks for a render or approves it.
+- Use `npm run dev` preview to validate layout, timing, captions, and styling first.
+- Keep fixing issues in preview until the user is satisfied; do not render intermediate versions that still need review.
+- Treat rendering as the final step after preview is clean and checks are passing.
+
 ## Documentation
 
 **For quick reference**, use the local CLI docs command (no network required):
