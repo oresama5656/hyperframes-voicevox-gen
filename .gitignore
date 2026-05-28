@@ -1,12 +1,63 @@
-# Node.js
+# =========================================================================
+# Node.js & Package Managers
+# =========================================================================
+# 全階層の依存ライブラリフォルダを除外します
 node_modules/
+**/node_modules/
+# npm や yarn などの実行ログファイル
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-debug.log*
 
-# 生成済みレンダリング動画（大容量のため除外）
+# =========================================================================
+# HyperFrames / VOICEVOX Cache & Output
+# =========================================================================
+# 生成されたレンダリング動画（大容量のため除外）
 video-generator/renders/
 
-# 一時WAVファイル
+# HyperFrames Studio の一時キャッシュ
+video-generator/.thumbnails/
+video-generator/.waveform-cache/
+
+# VOICEVOX や生成時の一時WAVファイル
 video-generator/assets/audio/*.wav
 
-# OS系
+# =========================================================================
+# Environment Variables & Secrets (Security Best Practice)
+# =========================================================================
+# APIキーなどの機密情報を守るため、環境変数ファイルは絶対にリポジトリに含めないのがプロの鉄則です
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+
+# =========================================================================
+# IDEs & Text Editors Settings
+# =========================================================================
+# 開発者個人の設定ファイルを除外します
+.vscode/
+# ※プロジェクト共通で推奨する拡張機能や実行設定は共有するために例外として残すのがスマートです
+!.vscode/extensions.json
+!.vscode/launch.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# =========================================================================
+# OS Generated Files
+# =========================================================================
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+
